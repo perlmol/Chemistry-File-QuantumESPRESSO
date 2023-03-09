@@ -33,7 +33,8 @@ sub parse_string {
             my( $symbol, @coords ) = split /\s+/, $line;
             push @atoms, [ $symbol, vector( @coords ) ];
         } elsif( $line =~ /^CELL_PARAMETERS angstrom$/ ) {
-            @cell_vectors = ( shift @lines, shift @lines, shift @lines );
+            @cell_vectors = map { vector( split /\s+/, $_ ) }
+                                ( shift @lines, shift @lines, shift @lines );
         }
     }
 
