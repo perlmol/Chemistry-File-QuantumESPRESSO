@@ -28,31 +28,21 @@ sub parse_string {
     my @atoms;
     my @cell_vectors;
 
-    my @lines = split "\n", $s;
+    my @lines = map { s/^\s+//; s/\s+$//; $_ } split "\n", $s;
     while (@lines) {
         my $line = shift @lines;
-        $line =~ s/^\s+//;
-        $line =~ s/\s+$//;
-
         if(      $line =~ /^&SYSTEM$/ ) {
             while( ($line = shift @lines) ne '/' ) {
-                $line =~ s/^\s+//;
-                $line =~ s/\s+$//;
-
                 my( $parameter, $value ) = split /\s*=\s*/, $line;
                 $natoms = int $value if $parameter eq 'nat';
             }
         } elsif( $line =~ /^ATOMIC_POSITIONS crystal$/ ) {
             for (1..$natoms) {
-                $line = shift @lines;
-                $line =~ s/^\s+//;
-                $line =~ s/\s+$//;
-
-                my( $symbol, @coords ) = split /\s+/, $line;
+                my( $symbol, @coords ) = split /\s+/, shift @lines;
                 push @atoms, [ $symbol, vector( @coords ) ];
             }
         } elsif( $line =~ /^CELL_PARAMETERS angstrom$/ ) {
-            @cell_vectors = map { s/^\s+//; s/\s+$//; vector( split /\s+/, $_ ) }
+            @cell_vectors = map { vector( split /\s+/, $_ ) }
                                 ( shift @lines, shift @lines, shift @lines );
         }
     }
