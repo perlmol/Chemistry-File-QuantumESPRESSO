@@ -54,6 +54,16 @@ sub parse_string {
     return ( $mol );
 }
 
+sub name_is {
+    my ($self, $fname) = @_;
+    $fname =~ /\.scf\.in(\.txt)?$/i;
+}
+
+sub file_is {
+    my ($self, $fname) = @_;
+    $fname =~ /\.scf\.in(\.txt)?$/i;
+}
+
 # Taken from cod-tools, rev. 9257
 sub _symop_ortho_from_fract
 {
