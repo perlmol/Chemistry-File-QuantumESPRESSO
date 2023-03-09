@@ -12,6 +12,8 @@ use Math::VectorReal qw(vector);
 use strict;
 use warnings;
 
+Chemistry::Mol->register_format(scf.in => __PACKAGE__);
+
 sub parse_string {
     my ($self, $s, %opts) = @_;
 
