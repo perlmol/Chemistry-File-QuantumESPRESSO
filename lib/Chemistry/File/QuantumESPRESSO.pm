@@ -14,6 +14,7 @@ use warnings;
 
 Chemistry::Mol->register_format('scf.in' => __PACKAGE__);
 
+# Format description: https://www.quantum-espresso.org/Doc/INPUT_PW.html
 sub parse_string {
     my ($self, $s, %opts) = @_;
 
