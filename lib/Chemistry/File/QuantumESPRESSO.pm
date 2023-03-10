@@ -14,6 +14,8 @@ use warnings;
 
 Chemistry::Mol->register_format('scf.in' => __PACKAGE__);
 
+my $bohrs_per_angstrom = 52.9177210903;
+
 # Format description: https://www.quantum-espresso.org/Doc/INPUT_PW.html
 sub parse_string {
     my ($self, $s, %opts) = @_;
@@ -44,12 +46,16 @@ sub parse_string {
                 my( $symbol, @coords ) = split /\s+/, shift @lines;
                 push @atoms, [ $symbol, vector( @coords ) ];
                 if( $atomic_positions_type eq 'bohr' ) {
-                    $atoms[-1]->[1] /= 52.9177210903;
+                    $atoms[-1]->[1] /= $bohrs_per_angstrom;
                 }
             }
-        } elsif( $line =~ /^CELL_PARAMETERS angstrom$/ ) {
+        } elsif( $line =~ /^CELL_PARAMETERS\s+(\S+)$/ ) {
+            my $cell_parameters_type = $1;
             @cell_vectors = map { vector( split /\s+/, $_ ) }
                                 ( shift @lines, shift @lines, shift @lines );
+            if( $cell_parameters_type eq 'bohr' ) {
+                @cell_vectors = map { $_ / $bohrs_per_angstrom } @cell_vectors;
+            }
         }
     }
 
