@@ -43,6 +43,9 @@ sub parse_string {
             for (1..$natoms) {
                 my( $symbol, @coords ) = split /\s+/, shift @lines;
                 push @atoms, [ $symbol, vector( @coords ) ];
+                if( $atomic_positions_type eq 'bohr' ) {
+                    $atoms[-1]->[1] /= 52.9177210903;
+                }
             }
         } elsif( $line =~ /^CELL_PARAMETERS angstrom$/ ) {
             @cell_vectors = map { vector( split /\s+/, $_ ) }
