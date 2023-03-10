@@ -26,6 +26,7 @@ sub parse_string {
     my $mol = $mol_class->new;
 
     my $natoms;
+    my $atomic_positions_type;
     my @atoms;
     my @cell_vectors;
 
@@ -37,7 +38,8 @@ sub parse_string {
                 my( $parameter, $value ) = split /\s*=\s*/, $line;
                 $natoms = int $value if $parameter eq 'nat';
             }
-        } elsif( $line =~ /^ATOMIC_POSITIONS crystal$/ ) {
+        } elsif( $line =~ /^ATOMIC_POSITIONS\s+(\S+)$/ ) {
+            $atomic_positions_type = $1;
             for (1..$natoms) {
                 my( $symbol, @coords ) = split /\s+/, shift @lines;
                 push @atoms, [ $symbol, vector( @coords ) ];
@@ -48,7 +50,10 @@ sub parse_string {
         }
     }
 
-    if( @cell_vectors ) {
+    if( $atomic_positions_type && $atomic_positions_type eq 'crystal' ) {
+        if( !@cell_vectors ) {
+            die 'no cell vectors to convert from crystal coordinates';
+        }
         my @lengths = map { $_->length } @cell_vectors;
         my $alpha = acos( ($cell_vectors[1] . $cell_vectors[2]) / ($lengths[1] * $lengths[2]) );
         my $beta  = acos( ($cell_vectors[0] . $cell_vectors[2]) / ($lengths[0] * $lengths[2]) );
